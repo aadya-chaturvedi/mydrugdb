@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Drug</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-5" style="max-width: 600px;">
+
+    <div class="card shadow-sm p-4">
+        <h2 class="mb-4 text-center">💊 Add / Edit Drug</h2>
+
+        <form th:action="@{/drugs}" th:object="${drug}" method="post">
+
+            <!-- Hidden ID (important for edit) -->
+            <input type="hidden" th:field="*{id}" />
+
+            <div class="mb-3">
+                <label class="form-label">Drug Name</label>
+                <input type="text" th:field="*{name}" class="form-control" placeholder="Enter drug name" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Manufacturer</label>
+                <input type="text" th:field="*{manufacturer}" class="form-control" placeholder="Enter manufacturer" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Usage</label>
+                <input type="text" th:field="*{usage}" class="form-control" placeholder="What is it used for?" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Side Effects</label>
+                <input type="text" th:field="*{sideEffects}" class="form-control" placeholder="Possible side effects" required>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a th:href="@{/drugs}" class="btn btn-secondary">← Back</a>
+                <button type="submit" class="btn btn-success">💾 Save Drug</button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+
+</body>
+</html>
