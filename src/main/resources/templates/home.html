@@ -16,11 +16,17 @@
         </p>
 
         <!-- 🔍 Search Form -->
-        <form th:action="@{/drugs}" method="get" class="mb-4">
+        <form th:action="@{/drugs/external-search}" method="get" class="mb-4">
             <div class="input-group">
-                <input type="text" name="keyword" class="form-control"
-                       placeholder="Search for a drug...">
-                <button class="btn btn-primary" type="submit">Search</button>
+                <input type="text"
+                       name="name"
+                       class="form-control"
+                       placeholder="Search for a medication..."
+                       required>
+
+                <button class="btn btn-primary" type="submit">
+                    Search
+                </button>
             </div>
         </form>
 

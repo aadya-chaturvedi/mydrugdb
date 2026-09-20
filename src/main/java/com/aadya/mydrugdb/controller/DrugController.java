@@ -5,6 +5,8 @@ import com.aadya.mydrugdb.repository.DrugRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import com.aadya.mydrugdb.service.MedicationDataService;
+import com.aadya.mydrugdb.dto.MedicationSearchResult;
 
 import java.util.List;
 
@@ -13,9 +15,12 @@ import java.util.List;
 public class DrugController {
 
     private final DrugRepository drugRepository;
+    private final MedicationDataService medicationDataService;
 
-    public DrugController(DrugRepository drugRepository) {
+    public DrugController(DrugRepository drugRepository,
+                          MedicationDataService medicationDataService) {
         this.drugRepository = drugRepository;
+        this.medicationDataService = medicationDataService;
     }
 
     @GetMapping
@@ -59,5 +64,30 @@ public class DrugController {
     public String deleteDrug(@PathVariable Long id) {
         drugRepository.deleteById(id);
         return "redirect:/drugs";
+    }
+
+    @GetMapping("/external-search")
+    public String showMedicationSearch(
+            @RequestParam(required = false) String name,
+            Model model) {
+
+        if (name != null && !name.trim().isEmpty()) {
+
+            MedicationSearchResult result =
+                    medicationDataService.searchMedication(name);
+
+            model.addAttribute("result", result);
+            model.addAttribute("searchedName", name);
+        }
+
+        return "medication-search";
+    }
+
+    @GetMapping("/search-test")
+    @ResponseBody
+    public MedicationSearchResult searchMedication(
+            @RequestParam String name) {
+
+        return medicationDataService.searchMedication(name);
     }
 }

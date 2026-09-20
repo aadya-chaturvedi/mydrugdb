@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Medication Search | MyDrugDB</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+</head>
+
+<body>
+
+<div class="container mt-5 mb-5" style="max-width: 900px;">
+
+    <!-- Header -->
+    <div class="text-center mb-4">
+        <h1>💊 MyDrugDB</h1>
+        <p class="text-muted">
+            Search medication information
+        </p>
+    </div>
+
+    <!-- Search Bar -->
+    <form th:action="@{/drugs/external-search}" method="get" class="mb-4">
+        <div class="input-group">
+
+            <input
+                    type="text"
+                    name="name"
+                    class="form-control"
+                    placeholder="Search for a medication..."
+                    th:value="${searchedName}"
+                    required>
+
+            <button class="btn btn-primary" type="submit">
+                Search
+            </button>
+
+        </div>
+    </form>
+
+
+    <!-- Medication Result -->
+    <div th:if="${result != null}">
+
+        <!-- Basic Information -->
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-body">
+
+                <h2 class="card-title mb-3"
+                    th:text="${result.name}">
+                    Medication Name
+                </h2>
+
+                <p class="mb-2">
+                    <strong>RxNorm ID:</strong>
+                    <span th:text="${result.id}"></span>
+                </p>
+
+                <p class="mb-0">
+                    <strong>Manufacturer:</strong>
+
+                    <span th:if="${result.manufacturer != null}"
+                          th:text="${result.manufacturer}">
+                    </span>
+
+                    <span th:if="${result.manufacturer == null}"
+                          class="text-muted">
+                        Not available
+                    </span>
+                </p>
+
+            </div>
+        </div>
+
+
+        <!-- Usage -->
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-body">
+
+                <h3 class="h5">
+                    Indications &amp; Usage
+                </h3>
+
+                <p th:if="${result.usage != null}"
+                   th:text="${result.usage}"
+                   style="white-space: pre-line;">
+                </p>
+
+                <p th:if="${result.usage == null}"
+                   class="text-muted">
+                    Usage information is not available.
+                </p>
+
+            </div>
+        </div>
+
+
+        <!-- Side Effects -->
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-body">
+
+                <h3 class="h5">
+                    Adverse Reactions
+                </h3>
+
+                <p th:if="${result.sideEffects != null}"
+                   th:text="${result.sideEffects}"
+                   style="white-space: pre-line;">
+                </p>
+
+                <p th:if="${result.sideEffects == null}"
+                   class="text-muted">
+                    Adverse reaction information is not available.
+                </p>
+
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- No Result -->
+    <div th:if="${searchedName != null and result == null}"
+         class="alert alert-warning">
+
+        No medication information was found for
+        <strong th:text="${searchedName}"></strong>.
+
+    </div>
+
+
+    <!-- Back Home -->
+    <div class="text-center mt-4">
+
+        <a th:href="@{/}"
+           class="btn btn-outline-secondary">
+            ← Back to Home
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>
