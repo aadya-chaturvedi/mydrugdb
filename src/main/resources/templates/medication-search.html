@@ -122,6 +122,41 @@
 
     </div>
 
+    <!-- Save Medication -->
+    <div class="text-center mb-4">
+
+        <form th:action="@{/drugs/save-external}" method="post">
+
+            <input type="hidden"
+                   name="rxcui"
+                   th:value="${result.id}">
+
+            <input type="hidden"
+                   name="name"
+                   th:value="${result.name}">
+
+            <input type="hidden"
+                   name="manufacturer"
+                   th:value="${result.manufacturer}">
+
+            <input type="hidden"
+                   name="usage"
+                   th:value="${result.usage}">
+
+            <input type="hidden"
+                   name="sideEffects"
+                   th:value="${result.sideEffects}">
+
+            <button type="submit"
+                    class="btn btn-success">
+                Save to My Database
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
 
     <!-- No Result -->
     <div th:if="${searchedName != null and result == null}"

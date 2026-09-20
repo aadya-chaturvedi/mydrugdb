@@ -28,7 +28,7 @@ public class DrugController {
         List<Drug> drugs;
 
         if (keyword != null && !keyword.trim().isEmpty()) {
-            drugs = drugRepository.findByNameContainingIgnoreCase(keyword);
+            drugs = drugRepository.searchDrugs(keyword);
         } else {
             drugs = drugRepository.findAll();
         }
@@ -49,6 +49,18 @@ public class DrugController {
     public String addDrug(@ModelAttribute Drug drug) {
         drugRepository.save(drug);
         return "redirect:/drugs";
+    }
+
+    @GetMapping("/{id}")
+    public String viewDrug(@PathVariable Long id, Model model) {
+
+        Drug drug = drugRepository.findById(id)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Invalid drug Id: " + id));
+
+        model.addAttribute("drug", drug);
+
+        return "drug-details";
     }
 
     @GetMapping("/edit/{id}")
@@ -81,6 +93,32 @@ public class DrugController {
         }
 
         return "medication-search";
+    }
+
+    @PostMapping("/save-external")
+    public String saveExternalDrug(
+            @RequestParam String rxcui,
+            @RequestParam String name,
+            @RequestParam(required = false) String manufacturer,
+            @RequestParam(required = false) String usage,
+            @RequestParam(required = false) String sideEffects) {
+
+        if (drugRepository.existsByRxcui(rxcui)) {
+            return "redirect:/drugs?duplicate=true";
+        }
+
+        Drug drug = new Drug(
+                name,
+                manufacturer,
+                usage,
+                sideEffects
+        );
+
+        drug.setRxcui(rxcui);
+
+        drugRepository.save(drug);
+
+        return "redirect:/drugs?saved=true";
     }
 
     @GetMapping("/search-test")

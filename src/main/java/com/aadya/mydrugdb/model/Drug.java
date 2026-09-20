@@ -5,6 +5,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Lob;
 
 @Entity
 @Table(name = "drug")
@@ -13,10 +15,13 @@ public class Drug {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    private String rxcui;
     private String name;
     private String manufacturer;
+    @Lob
     private String usage;
+
+    @Lob
     private String sideEffects;
 
     public Drug() {
@@ -67,5 +72,13 @@ public class Drug {
 
     public void setSideEffects(String sideEffects) {
         this.sideEffects = sideEffects;
+    }
+
+    public String getRxcui() {
+        return rxcui;
+    }
+
+    public void setRxcui(String rxcui) {
+        this.rxcui = rxcui;
     }
 }
