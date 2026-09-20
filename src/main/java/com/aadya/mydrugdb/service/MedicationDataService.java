@@ -5,6 +5,8 @@ import com.aadya.mydrugdb.dto.RxNormResponse;
 import com.aadya.mydrugdb.dto.OpenFdaResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.HttpClientErrorException;
+
 
 @Service
 public class MedicationDataService {
@@ -35,17 +37,46 @@ public class MedicationDataService {
         }
 
         // Look through the RxNorm results
+        RxNormResponse.ConceptProperties result = null;
+        RxNormResponse.ConceptProperties fallback = null;
         for (RxNormResponse.ConceptGroup group :
                 response.getDrugGroup().getConceptGroup()) {
 
             if (group.getConceptProperties() != null &&
                     !group.getConceptProperties().isEmpty()) {
 
-                // Get the first RxNorm result
-                RxNormResponse.ConceptProperties result =
-                        group.getConceptProperties().get(0);
+                // Get the RxNorm result that matches the searched term firstly otherwise continue
 
-                // Use the RxCUI to search openFDA
+                for (RxNormResponse.ConceptProperties concept :
+                        group.getConceptProperties()) {
+
+                    if (concept.getName().toLowerCase()
+                            .startsWith(name.toLowerCase())) {
+
+                        fallback = concept;
+                    }
+
+                    if (concept.getName().toLowerCase()
+                            .startsWith(name.toLowerCase())
+                            && !concept.getName().contains("/")) {
+
+                        result = concept;
+                        break;
+                    }
+                }
+
+            }
+        }
+
+                if (result == null) {
+                    result = fallback;
+                }
+
+                if (result == null) {
+                    return null;
+                }
+
+                 // Use the RxCUI to search openFDA
                 OpenFdaResponse fdaResponse =
                         searchOpenFda(result.getRxcui());
 
@@ -99,20 +130,22 @@ public class MedicationDataService {
                         sideEffects
                 );
             }
-        }
 
-        return null;
-    }
 
     private OpenFdaResponse searchOpenFda(String rxcui) {
 
         String url = "https://api.fda.gov/drug/label.json";
 
-        OpenFdaResponse response = restClient.get()
-                .uri(url + "?search=openfda.rxcui:{rxcui}&limit=1", rxcui)
-                .retrieve()
-                .body(OpenFdaResponse.class);
+        try {
 
-        return response;
+            return restClient.get()
+                    .uri(url + "?search=openfda.rxcui:{rxcui}&limit=1", rxcui)
+                    .retrieve()
+                    .body(OpenFdaResponse.class);
+
+        } catch (HttpClientErrorException.NotFound e) {
+
+            return null;
+        }
     }
 }
