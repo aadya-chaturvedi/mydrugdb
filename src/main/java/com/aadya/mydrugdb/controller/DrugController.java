@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import com.aadya.mydrugdb.service.MedicationDataService;
 import com.aadya.mydrugdb.dto.MedicationSearchResult;
 
+import org.springframework.web.client.RestClientException;
+
 import java.util.List;
 
 @Controller
@@ -47,6 +49,10 @@ public class DrugController {
 
     @PostMapping
     public String addDrug(@ModelAttribute Drug drug) {
+        // Manually added drugs have no RxNorm ID; store null rather than ""
+        if (drug.getRxcui() != null && drug.getRxcui().isBlank()) {
+            drug.setRxcui(null);
+        }
         drugRepository.save(drug);
         return "redirect:/drugs";
     }
@@ -72,7 +78,8 @@ public class DrugController {
         return "add-drug";
     }
 
-    @GetMapping("/delete/{id}")
+    // POST (not GET) so a stray link click or browser prefetch can't delete a drug
+    @PostMapping("/delete/{id}")
     public String deleteDrug(@PathVariable Long id) {
         drugRepository.deleteById(id);
         return "redirect:/drugs";
@@ -83,14 +90,24 @@ public class DrugController {
             @RequestParam(required = false) String name,
             Model model) {
 
+        boolean searchError = false;
+
         if (name != null && !name.trim().isEmpty()) {
 
-            MedicationSearchResult result =
-                    medicationDataService.searchMedication(name);
+            MedicationSearchResult result = null;
+
+            try {
+                result = medicationDataService.searchMedication(name);
+            } catch (RestClientException e) {
+                // RxNorm couldn't be reached (no internet, API down, etc.)
+                searchError = true;
+            }
 
             model.addAttribute("result", result);
             model.addAttribute("searchedName", name);
         }
+
+        model.addAttribute("searchError", searchError);
 
         return "medication-search";
     }

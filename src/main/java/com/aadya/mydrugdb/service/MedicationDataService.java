@@ -5,7 +5,7 @@ import com.aadya.mydrugdb.dto.RxNormResponse;
 import com.aadya.mydrugdb.dto.OpenFdaResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 
 
 @Service
@@ -143,8 +143,9 @@ public class MedicationDataService {
                     .retrieve()
                     .body(OpenFdaResponse.class);
 
-        } catch (HttpClientErrorException.NotFound e) {
+        } catch (RestClientException e) {
 
+            // No label found (404) or openFDA unavailable: still show the RxNorm result
             return null;
         }
     }

@@ -1,101 +1,85 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
-<head>
-    <meta charset="UTF-8">
-    <title>Drug Details | MyDrugDB</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-</head>
-
+<head th:replace="~{fragments/layout :: head('Drug Details | MyDrugDB')}"></head>
 <body>
 
-<div class="container mt-5 mb-5" style="max-width: 900px;">
+<div th:replace="~{fragments/layout :: deco}"></div>
+<header th:replace="~{fragments/layout :: topbar('drugs')}"></header>
 
-    <div class="mb-4">
-        <h1>💊 Drug Details</h1>
+<main class="page">
+
+    <div class="win">
+        <div class="bar">
+            <span>Drug Details</span>
+            <div th:replace="~{fragments/layout :: dots}"></div>
+        </div>
+
+        <div class="win-body">
+            <h1 class="title-big" th:text="${drug.name}">Drug Name</h1>
+
+            <div class="info-row">
+                <span>
+                    <span class="label">Manufacturer:</span>
+                    <span th:text="${drug.manufacturer}"></span>
+                </span>
+
+                <span th:if="${drug.rxcui != null}">
+                    <span class="label">RxNorm ID:</span>
+                    <span class="badge" th:text="${drug.rxcui}"></span>
+                </span>
+            </div>
+        </div>
     </div>
 
-    <div class="card shadow-sm mb-4">
+    <div class="two-col">
 
-        <div class="card-body">
+        <!-- Usage -->
+        <div id="usage" class="win">
+            <div class="bar">
+                <span>Indications &amp; Usage</span>
+                <div th:replace="~{fragments/layout :: dots}"></div>
+            </div>
+            <div class="win-body">
+                <h2 class="h-pink sm">Indications &amp; Usage</h2>
 
-            <h2 class="card-title mb-3"
-                th:text="${drug.name}">
-                Drug Name
-            </h2>
+                <p th:if="${drug.usage != null}"
+                   th:text="${drug.usage}"
+                   class="long-text">
+                </p>
 
-            <p>
-                <strong>Manufacturer:</strong>
-                <span th:text="${drug.manufacturer}"></span>
-            </p>
+                <p th:if="${drug.usage == null}" class="muted">
+                    Usage information is not available.
+                </p>
+            </div>
+        </div>
 
-            <p th:if="${drug.rxcui != null}">
-                <strong>RxNorm ID:</strong>
-                <span th:text="${drug.rxcui}"></span>
-            </p>
+        <!-- Side Effects -->
+        <div id="side-effects" class="win blue">
+            <div class="bar">
+                <span>Adverse Reactions</span>
+                <div th:replace="~{fragments/layout :: dots}"></div>
+            </div>
+            <div class="win-body">
+                <h2 class="h-blue">Adverse Reactions</h2>
 
+                <p th:if="${drug.sideEffects != null}"
+                   th:text="${drug.sideEffects}"
+                   class="long-text">
+                </p>
+
+                <p th:if="${drug.sideEffects == null}" class="muted">
+                    Adverse reaction information is not available.
+                </p>
+            </div>
         </div>
 
     </div>
 
-    <!-- Usage -->
-    <div id="usage" class="card shadow-sm mb-4">
+    <a th:href="@{/drugs}" class="btn lav">
+        ← Back to Drug Database
+    </a>
 
-        <div class="card-body">
-
-            <h3 class="h5">
-                Indications &amp; Usage
-            </h3>
-
-            <p th:if="${drug.usage != null}"
-               th:text="${drug.usage}"
-               style="white-space: pre-line;">
-            </p>
-
-            <p th:if="${drug.usage == null}"
-               class="text-muted">
-                Usage information is not available.
-            </p>
-
-        </div>
-
-    </div>
-
-    <!-- Side Effects -->
-    <div id="side-effects" class="card shadow-sm mb-4">
-
-        <div class="card-body">
-
-            <h3 class="h5">
-                Adverse Reactions
-            </h3>
-
-            <p th:if="${drug.sideEffects != null}"
-               th:text="${drug.sideEffects}"
-               style="white-space: pre-line;">
-            </p>
-
-            <p th:if="${drug.sideEffects == null}"
-               class="text-muted">
-                Adverse reaction information is not available.
-            </p>
-
-        </div>
-
-    </div>
-
-    <div class="mt-4">
-
-        <a th:href="@{/drugs}"
-           class="btn btn-outline-secondary">
-            ← Back to Drug Database
-        </a>
-
-    </div>
-
-</div>
+</main>
 
 </body>
 </html>

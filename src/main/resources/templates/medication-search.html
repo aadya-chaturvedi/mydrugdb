@@ -1,184 +1,155 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Medication Search | MyDrugDB</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-</head>
-
+<head th:replace="~{fragments/layout :: head('Medication Search | MyDrugDB')}"></head>
 <body>
 
-<div class="container mt-5 mb-5" style="max-width: 900px;">
+<div th:replace="~{fragments/layout :: deco}"></div>
+<header th:replace="~{fragments/layout :: topbar('home')}"></header>
 
-    <!-- Header -->
-    <div class="text-center mb-4">
-        <h1>💊 MyDrugDB</h1>
-        <p class="text-muted">
-            Search medication information
-        </p>
+<main class="page">
+
+    <!-- Header + Search Bar -->
+    <div class="win">
+        <div class="bar">
+            <span>Medication Search</span>
+            <div th:replace="~{fragments/layout :: dots}"></div>
+        </div>
+
+        <div class="win-body">
+            <div class="center" style="margin-bottom:18px">
+                <h1 class="h-pink" style="margin-bottom:4px">MyDrugDB</h1>
+                <p class="lead">Search medication information</p>
+            </div>
+
+            <form th:action="@{/drugs/external-search}" method="get" class="search-row">
+                <input
+                        type="text"
+                        name="name"
+                        class="input"
+                        placeholder="Search for a medication..."
+                        th:value="${searchedName}"
+                        required>
+
+                <button class="btn" type="submit">
+                    Search
+                </button>
+            </form>
+        </div>
     </div>
 
-    <!-- Search Bar -->
-    <form th:action="@{/drugs/external-search}" method="get" class="mb-4">
-        <div class="input-group">
+    <!-- Lookup failed (e.g. no internet or RxNorm/openFDA down) -->
+    <div th:if="${searchError}" class="alert err">
+        Couldn't reach the medication database right now. Please try again in a moment.
+    </div>
 
-            <input
-                    type="text"
-                    name="name"
-                    class="form-control"
-                    placeholder="Search for a medication..."
-                    th:value="${searchedName}"
-                    required>
-
-            <button class="btn btn-primary" type="submit">
-                Search
-            </button>
-
-        </div>
-    </form>
-
+    <!-- No Result -->
+    <div th:if="${searchedName != null and result == null and !searchError}"
+         class="alert warn">
+        No medication information was found for
+        <strong th:text="${searchedName}"></strong>.
+    </div>
 
     <!-- Medication Result -->
     <div th:if="${result != null}">
 
         <!-- Basic Information -->
-        <div class="card shadow-sm mb-4">
+        <div class="win">
+            <div class="bar">
+                <span>Medication</span>
+                <div th:replace="~{fragments/layout :: dots}"></div>
+            </div>
+            <div class="win-body">
+                <h2 class="title-big md" th:text="${result.name}">Medication Name</h2>
 
-            <div class="card-body">
-
-                <h2 class="card-title mb-3"
-                    th:text="${result.name}">
-                    Medication Name
-                </h2>
-
-                <p class="mb-2">
-                    <strong>RxNorm ID:</strong>
-                    <span th:text="${result.id}"></span>
-                </p>
-
-                <p class="mb-0">
-                    <strong>Manufacturer:</strong>
-
-                    <span th:if="${result.manufacturer != null}"
-                          th:text="${result.manufacturer}">
+                <div class="info-row">
+                    <span>
+                        <span class="label">RxNorm ID:</span>
+                        <span class="badge" th:text="${result.id}"></span>
                     </span>
 
-                    <span th:if="${result.manufacturer == null}"
-                          class="text-muted">
-                        Not available
+                    <span>
+                        <span class="label">Manufacturer:</span>
+                        <span th:if="${result.manufacturer != null}"
+                              th:text="${result.manufacturer}">
+                        </span>
+                        <span th:if="${result.manufacturer == null}" class="muted">
+                            Not available
+                        </span>
                     </span>
-                </p>
-
+                </div>
             </div>
         </div>
 
+        <div class="two-col">
 
-        <!-- Usage -->
-        <div class="card shadow-sm mb-4">
+            <!-- Usage -->
+            <div class="win">
+                <div class="bar">
+                    <span>Indications &amp; Usage</span>
+                    <div th:replace="~{fragments/layout :: dots}"></div>
+                </div>
+                <div class="win-body">
+                    <h3 class="h-pink sm">Indications &amp; Usage</h3>
 
-            <div class="card-body">
+                    <p th:if="${result.usage != null}"
+                       th:text="${result.usage}"
+                       class="long-text">
+                    </p>
 
-                <h3 class="h5">
-                    Indications &amp; Usage
-                </h3>
-
-                <p th:if="${result.usage != null}"
-                   th:text="${result.usage}"
-                   style="white-space: pre-line;">
-                </p>
-
-                <p th:if="${result.usage == null}"
-                   class="text-muted">
-                    Usage information is not available.
-                </p>
-
+                    <p th:if="${result.usage == null}" class="muted">
+                        Usage information is not available.
+                    </p>
+                </div>
             </div>
+
+            <!-- Side Effects -->
+            <div class="win blue">
+                <div class="bar">
+                    <span>Adverse Reactions</span>
+                    <div th:replace="~{fragments/layout :: dots}"></div>
+                </div>
+                <div class="win-body">
+                    <h3 class="h-blue">Adverse Reactions</h3>
+
+                    <p th:if="${result.sideEffects != null}"
+                       th:text="${result.sideEffects}"
+                       class="long-text">
+                    </p>
+
+                    <p th:if="${result.sideEffects == null}" class="muted">
+                        Adverse reaction information is not available.
+                    </p>
+                </div>
+            </div>
+
         </div>
 
+        <!-- Save Medication (only shown when there is a result) -->
+        <div class="center" style="margin-bottom:24px">
+            <form th:action="@{/drugs/save-external}" method="post">
 
-        <!-- Side Effects -->
-        <div class="card shadow-sm mb-4">
+                <input type="hidden" name="rxcui" th:value="${result.id}">
+                <input type="hidden" name="name" th:value="${result.name}">
+                <input type="hidden" name="manufacturer" th:value="${result.manufacturer}">
+                <input type="hidden" name="usage" th:value="${result.usage}">
+                <input type="hidden" name="sideEffects" th:value="${result.sideEffects}">
 
-            <div class="card-body">
-
-                <h3 class="h5">
-                    Adverse Reactions
-                </h3>
-
-                <p th:if="${result.sideEffects != null}"
-                   th:text="${result.sideEffects}"
-                   style="white-space: pre-line;">
-                </p>
-
-                <p th:if="${result.sideEffects == null}"
-                   class="text-muted">
-                    Adverse reaction information is not available.
-                </p>
-
-            </div>
+                <button type="submit" class="btn">
+                    Save to My Database
+                </button>
+            </form>
         </div>
 
     </div>
-
-    <!-- Save Medication -->
-    <div class="text-center mb-4">
-
-        <form th:action="@{/drugs/save-external}" method="post">
-
-            <input type="hidden"
-                   name="rxcui"
-                   th:value="${result.id}">
-
-            <input type="hidden"
-                   name="name"
-                   th:value="${result.name}">
-
-            <input type="hidden"
-                   name="manufacturer"
-                   th:value="${result.manufacturer}">
-
-            <input type="hidden"
-                   name="usage"
-                   th:value="${result.usage}">
-
-            <input type="hidden"
-                   name="sideEffects"
-                   th:value="${result.sideEffects}">
-
-            <button type="submit"
-                    class="btn btn-success">
-                Save to My Database
-            </button>
-
-        </form>
-
-    </div>
-
-</div>
-
-    <!-- No Result -->
-    <div th:if="${searchedName != null and result == null}"
-         class="alert alert-warning">
-
-        No medication information was found for
-        <strong th:text="${searchedName}"></strong>.
-
-    </div>
-
 
     <!-- Back Home -->
-    <div class="text-center mt-4">
-
-        <a th:href="@{/}"
-           class="btn btn-outline-secondary">
+    <div class="center">
+        <a th:href="@{/}" class="btn lav">
             ← Back to Home
         </a>
-
     </div>
 
-</div>
+</main>
 
 </body>
 </html>
