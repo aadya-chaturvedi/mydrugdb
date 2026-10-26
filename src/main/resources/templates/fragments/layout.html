@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!-- Shared <head>: fonts + theme stylesheet -->
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title}">MyDrugDB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@500;600;700;800&family=VT323&display=swap"
+          rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/y2k.css}">
+</head>
+
+<body>
+
+<!-- Top bar with logo and page links. active = 'home' or 'drugs' -->
+<header th:fragment="topbar(active)" class="top">
+    <a th:href="@{/}" class="logo">MyDrugDB</a>
+    <nav class="tabs">
+        <a th:href="@{/}" class="tab" th:classappend="${active == 'home'} ? 'on'">Home</a>
+        <a th:href="@{/drugs}" class="tab" th:classappend="${active == 'drugs'} ? 'on'">All Drugs</a>
+    </nav>
+</header>
+
+<!-- Floating sparkles and hearts in the background -->
+<div th:fragment="deco" class="deco" aria-hidden="true">
+    <span class="spark" style="left:6%;top:30%;font-size:46px">✦</span>
+    <span class="spark" style="left:10%;top:42%;font-size:26px">✧</span>
+    <span class="spark" style="right:6%;top:24%;font-size:40px">✦</span>
+    <span class="spark" style="right:4%;top:66%;font-size:52px">✦</span>
+    <span class="heart" style="left:4%;top:70%;font-size:38px">♥</span>
+    <span class="heart" style="right:9%;top:84%;font-size:32px;color:#8f5fd6">♥</span>
+    <span class="heart" style="left:14%;top:88%;font-size:24px;color:#6fb6ec">♥</span>
+</div>
+
+<!-- Window title bar buttons -->
+<div th:fragment="dots" class="dots" aria-hidden="true"><i>_</i><i>□</i><i>x</i></div>
+
+</body>
+</html>
